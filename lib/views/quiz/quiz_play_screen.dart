@@ -54,7 +54,6 @@ class _QuizPlayScreenState extends State<QuizPlayScreen> {
   }
 
   Widget _buildQuestionCard(Question question) {
-    print('question:$question');
     return Card(
         borderOnForeground: true,
         elevation: 5,
