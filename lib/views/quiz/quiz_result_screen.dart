@@ -31,18 +31,6 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
     _connectivityStream = Connectivity().onConnectivityChanged;
     developer.log('listning');
     _saveScore();
-
-
-    // _connectivityStream.listen((ConnectivityResult result) {
-    //   if (result == ConnectivityResult.wifi) {
-    //     developer.log('sync_connectivityStream:==$ConnectivityResult');
-    //     _syncScore();
-    //   } else if (result == ConnectivityResult.none) {
-    //     developer.log('No internet');
-    //     developer.log('connectivityStream:==$ConnectivityResult');
-    //     // _saveScore();
-    //   }
-    // });
   }
 
   Future<void> _saveScore() async {
@@ -55,47 +43,105 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
   @override
   Widget build(BuildContext context) {
     double percentage = (_quizResult.correctAnswers / _quizResult.totalQuestions) * 100;
-    String score= 'You got ${_quizResult.correctAnswers} out of ${_quizResult.totalQuestions} correct!';
+    String scoreMessage = 'You got score is : $percentage %';
     final isOnline = Provider.of<ConnectivityProvider>(context).isOnline;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Quiz Result"),
+        backgroundColor: Colors.blueAccent,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                      'You score: ${percentage.toStringAsFixed(2)}%',
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold)),
-                  ElevatedButton(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blue[200]!, Colors.blue[600]!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Card(
+              elevation: 10,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Your Score',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue[800],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      '${percentage.toStringAsFixed(2)}%',
+                      style: TextStyle(
+                        fontSize: 48,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                        textStyle: const TextStyle(fontSize: 18),
+                      ),
                       onPressed: () {
                         Navigator.pushReplacementNamed(
-                            context, AppRoutes.quizPlay,
-                            arguments: widget.resultCalculator.quiz);
+                          context,
+                          AppRoutes.quizPlay,
+                          arguments: widget.resultCalculator.quiz,
+                        );
                       },
-                      child: const Text("Retake Quiz")),
-                  ElevatedButton(
+                      child: const Text("Retake Quiz",style: TextStyle(color: Colors.white),),
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                        textStyle: const TextStyle(fontSize: 18),
+                      ),
                       onPressed: () {
-                        Navigator.pushNamed(context, AppRoutes.quizReview,
-                            arguments: widget.resultCalculator);
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes.quizReview,
+                          arguments: widget.resultCalculator
+                        );
                       },
-                      child: const Text("Review Answers")),
-                  ElevatedButton(
+                      child: const Text("Review Answers",style: TextStyle(color: Colors.white),),
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                        textStyle: const TextStyle(fontSize: 18),
+                      ),
                       onPressed: () {
                         Navigator.of(context).pushNamedAndRemoveUntil(
-                            AppRoutes.quizList, (route) => false);
+                          AppRoutes.quizList,
+                              (route) => false,
+                        );
                       },
-                      child: const Text("Go back to Quiz List")),
-                ],
+                      child: const Text("Go back to Quiz List",style: TextStyle(color: Colors.white),),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizv/views/question/question_form_screen.dart';
 
-
 import '../../constants/app_routes.dart';
 import '../../models/answer.dart';
 import '../../models/question.dart';
@@ -10,8 +9,7 @@ import '../../models/quiz.dart';
 class QuestionDetailScreen extends StatefulWidget {
   final Question question;
 
-  const QuestionDetailScreen({Key? key, required this.question})
-      : super(key: key);
+  const QuestionDetailScreen({Key? key, required this.question}) : super(key: key);
 
   @override
   _QuestionDetailScreenState createState() => _QuestionDetailScreenState();
@@ -35,22 +33,27 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
+          title: const Text('Question Detail'),
           actions: [
             IconButton(
-                icon: const Icon(Icons.edit),
-                tooltip: "Edit Question",
-                onPressed: () async {
-                  Quiz tmpQuiz = await Navigator.pushNamed(
-                      context, AppRoutes.questionForm,
-                      arguments: QuestionFormScreenArgs(
-                          quizID: question.quizID, question: question)) as Quiz;
-                  setState(() {
-                    question = tmpQuiz.questions
-                        .firstWhere((q) => q.id == question.id);
-                  });
-                })
+              icon: const Icon(Icons.edit),
+              tooltip: "Edit Question",
+              onPressed: () async {
+                Quiz tmpQuiz = await Navigator.pushNamed(
+                  context,
+                  AppRoutes.questionForm,
+                  arguments: QuestionFormScreenArgs(
+                    quizID: question.quizID,
+                    question: question,
+                  ),
+                ) as Quiz;
+
+                setState(() {
+                  question = tmpQuiz.questions.firstWhere((q) => q.id == question.id);
+                });
+              },
+            ),
           ],
-          title: const Text('Question Detail'),
         ),
         body: _buildQuestionDetail(),
       ),
@@ -58,25 +61,33 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
   }
 
   Widget _buildQuestionDetail() {
-    return Column(
-      children: [
-        Wrap(
-          alignment: WrapAlignment.start,
-          children: [
-            Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(question.questionText,
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold))),
-          ],
-        ),
-        const SizedBox(height: 16.0),
-        const Text('Answers'),
-        const SizedBox(height: 16.0),
-        Expanded(
-          child: _answerListBuilder(),
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Question text
+          Text(
+            question.questionText,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16.0),
+          const Text(
+            'Answers',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8.0),
+          Expanded(
+            child: _answerListBuilder(),
+          ),
+        ],
+      ),
     );
   }
 
@@ -100,6 +111,8 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
 
   Widget _buildAnswerTile(BuildContext context, Answer answer) {
     return Card(
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
       child: ListTile(
         title: Text(answer.text),
         trailing: answer.correct

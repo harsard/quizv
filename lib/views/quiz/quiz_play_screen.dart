@@ -19,8 +19,8 @@ class _QuizPlayScreenState extends State<QuizPlayScreen> {
 
   @override
   void initState() {
-    _resultCalculator = ResultCalculator(quiz: widget.quiz);
     super.initState();
+    _resultCalculator = ResultCalculator(quiz: widget.quiz);
   }
 
   @override
@@ -40,14 +40,23 @@ class _QuizPlayScreenState extends State<QuizPlayScreen> {
               },
             ),
           ),
-          Text("Question $index of ${widget.quiz.questions.length}",
-              style: const TextStyle(fontSize: 16)),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              "Question $index of ${widget.quiz.questions.length}",
+              style: const TextStyle(fontSize: 16),
+            ),
+          ),
           ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, AppRoutes.quizResult,
-                    arguments: _resultCalculator);
-              },
-              child: const Text("Submit Quiz"))
+            onPressed: () {
+              Navigator.pushReplacementNamed(
+                context,
+                AppRoutes.quizResult,
+                arguments: _resultCalculator,
+              );
+            },
+            child: const Text("Submit Quiz"),
+          ),
         ],
       ),
     );
@@ -55,60 +64,63 @@ class _QuizPlayScreenState extends State<QuizPlayScreen> {
 
   Widget _buildQuestionCard(Question question) {
     return Card(
-        borderOnForeground: true,
-        elevation: 5,
-        margin: const EdgeInsets.all(10),
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Text(question.questionText,
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold)),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: question.answers.length,
-                  itemBuilder: (context, index) {
-                    return CheckboxListTile(
-                      title: Text(question.answers[index].text),
-                      value: _resultCalculator.answers[question.id]
-                              ?.contains(question.answers[index].id) ??
-                          false,
-                      onChanged: (value) {
-                        setState(() {
-                          var answers = _resultCalculator.answers;
-                          var quiz = _resultCalculator.quiz;
+      elevation: 5,
+      margin: const EdgeInsets.all(10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              question.questionText,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16.0), // Added spacing between question and answers
+            Expanded(
+              child: ListView.builder(
+                itemCount: question.answers.length,
+                itemBuilder: (context, index) {
+                  return _buildAnswerCheckbox(question, index);
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-                          if (value == true) {
-                            if (question.answers[index].id != null) {
-                              answers[question.id] = [
-                                ...answers[question.id] ?? [],
-                                question.answers[index].id!
-                              ];
-                              _resultCalculator = ResultCalculator(quiz: quiz);
-                              _resultCalculator.setAnswers(answers);
-                            }
-                          } else {
-                            if (question.answers[index].id != null) {
-                              answers[question.id] = [
-                                ...answers[question.id] ?? []
-                              ];
-                              answers[question.id]
-                                  ?.remove(question.answers[index].id);
-                              _resultCalculator = ResultCalculator(quiz: quiz);
-                              _resultCalculator.setAnswers(answers);
-                            }
-                          }
-                        });
-                      },
-                    );
-                  },
-                ),
-              )
-            ],
-          ),
-        ));
+  Widget _buildAnswerCheckbox(Question question, int index) {
+    return CheckboxListTile(
+      title: Text(question.answers[index].text),
+      value: _resultCalculator.answers[question.id]?.contains(question.answers[index].id) ?? false,
+      onChanged: (value) {
+        setState(() {
+          _updateAnswers(question, index, value);
+        });
+      },
+    );
+  }
+
+  void _updateAnswers(Question question, int index, bool? value) {
+    var answers = _resultCalculator.answers;
+    var quiz = _resultCalculator.quiz;
+
+    if (value == true) {
+      if (question.answers[index].id != null) {
+        answers[question.id] = [
+          ...answers[question.id] ?? [],
+          question.answers[index].id!
+        ];
+      }
+    } else {
+      if (question.answers[index].id != null) {
+        answers[question.id]?.remove(question.answers[index].id);
+      }
+    }
+
+    _resultCalculator = ResultCalculator(quiz: quiz);
+    _resultCalculator.setAnswers(answers);
   }
 }
